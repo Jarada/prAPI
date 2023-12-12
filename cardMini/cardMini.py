@@ -1,5 +1,4 @@
 import requests
-from redbot.core import commands, data_manager
 import random
 import os
 import discord
@@ -9,16 +8,16 @@ import math
 import asyncio
 import re
 import time
+from discord import Member
 
 
-def is_owner_overridable():
-    # Similar to @commands.is_owner()
-    # Unlike that, however, this check can be overridden with core Permissions
-    def predicate(ctx):
-        return False
-    return commands.permissions_check(predicate)
+class DataManager:
+    @staticmethod
+    def cog_data_path(card_mini):
+        return ""
+data_manager = DataManager()
 
-class cardMini(commands.Cog):
+class CardMini:
     def __init__(self, bot):
         self.bot = bot
         self.sell_mod=1.1
@@ -28,8 +27,8 @@ class cardMini(commands.Cog):
         self.payout_time=300
 
 
-    @commands.command(name='list_tables')
-    @commands.is_owner()
+    #@commands.command(name='list_tables')
+    #@commands.is_owner()
     async def list_tables(self, ctx):
         """List all tables in the database"""
         # Get the server ID
@@ -62,15 +61,15 @@ class cardMini(commands.Cog):
 
     
 
-    @commands.command(name='set_payout_time')
-    @commands.is_owner()    
+    #@commands.command(name='set_payout_time')
+    #@commands.is_owner()
     async def set_payout_time(self,ctx,time):
         """Sets the cooldown that gives money per message sent, starts at 300 ( 5 minutes)"""
         self.payout_time=time
         await ctx.send(f"Message time set to {time}")
 
-    @commands.command(name="set_stock")
-    @commands.is_owner()
+    #@commands.command(name="set_stock")
+    #@commands.is_owner()
     async def set_stock_command(self, ctx, series: str, count: int):
         try:
             series = f"Season_{series}"
@@ -103,8 +102,8 @@ class cardMini(commands.Cog):
 
 
     
-    @commands.command(name='updateNames')
-    @commands.is_owner()
+    #@commands.command(name='updateNames')
+    #@commands.is_owner()
     async def updateNames(self,ctx):
         """This WILL PING EVERYONE IN THE SERVER, it is used to mass update names DO NOT USE IT UNLESS YOU ARE IN A PRIVIATE CHANNEL"""
         member_ids = [member.id for member in ctx.guild.members]
@@ -115,7 +114,7 @@ class cardMini(commands.Cog):
             formatted_ids = [f"<@{member_id}>" for member_id in chunk]
             await ctx.send(f"List of member IDs: {' '.join(formatted_ids)}")
         
-    @commands.command(name='DV_leaderboard', aliases=['DVL', 'leaderboard_DV','top'])
+    #@commands.command(name='DV_leaderboard', aliases=['DVL', 'leaderboard_DV','top'])
     async def DV_leaderboard(self, ctx, count: int = 10):
         """Displayes a leaderboard with whoever has the most Deck value {# per page} default 10"""
         if count > 20:
@@ -210,7 +209,7 @@ class cardMini(commands.Cog):
             conn.close()
         
     
-    @commands.command(name='bank_leaderboard',aliases=["BL","leaderboard_bank","bank_top","top_bank"])
+    #@commands.command(name='bank_leaderboard',aliases=["BL","leaderboard_bank","bank_top","top_bank"])
     async def bank_leaderboard(self, ctx, count: int = 10):
         """Displayes a leaderboard with whoever has the most Deck value {# per page} default 10"""
 
@@ -304,8 +303,8 @@ class cardMini(commands.Cog):
 
 
         
-    @commands.command(name='setOnSeason')
-    @commands.is_owner()
+    #@commands.command(name='setOnSeason')
+    #@commands.is_owner()
     async def setOnSeason(self,ctx,series):
         """Sets what season is the 'on' Season defults to the last season created"""
         file = os.path.join(data_manager.cog_data_path(self), 'on_season.txt')
@@ -324,8 +323,8 @@ class cardMini(commands.Cog):
             return f.read()
 
     
-    @commands.command(name='setOffSeasonChance')
-    @commands.is_owner()
+    #@commands.command(name='setOffSeasonChance')
+    #@commands.is_owner()
     async def setOffSeasonChance(self,ctx,percent):
         """Sets the chance to pull cards from old seasons defualts to 10%"""
         percent = percent.strip("%")
@@ -418,8 +417,8 @@ class cardMini(commands.Cog):
                 return member.name
         return mention        
     
-    @commands.command(name='set_rarities')
-    @commands.is_owner()
+    #@commands.command(name='set_rarities')
+    #@commands.is_owner()
     async def set_rarities(self, ctx, series, *mentions_and_rarities):
         """Mannually sets the rarity of given card(s), must be entered in {userID} {rarity} pairs"""
         await ctx.send(len(mentions_and_rarities))
@@ -490,8 +489,8 @@ class cardMini(commands.Cog):
 
     
    
-    @commands.command(name='mine_salt',aliases=["mine","salt","work"])
-    @commands.cooldown(1, 30, commands.BucketType.user)
+    #@commands.command(name='mine_salt',aliases=["mine","salt","work"])
+    #@commands.cooldown(1, 30, commands.BucketType.user)
     async def work(self,ctx):
         """Work and adds a small amount of bank to the user"""
         server_id = str(ctx.guild.id)
@@ -527,16 +526,16 @@ class cardMini(commands.Cog):
             # Send the random line to the user
             await ctx.send(f"Uh oh! Instead of working... {bad_stuff[0]}")
     
-    @commands.command(name='set_sell_mod')
-    @commands.is_owner()
-    async def set_sell_mod(self,mod:float):
+    #@commands.command(name='set_sell_mod')
+    #@commands.is_owner()
+    async def set_sell_mod(self, ctx, mod:float):
         """Sets the sell modifier, make sure it is lower than the buy mod and higher than 1 unless you want a wonky game."""
         self.sell_mod=mod
         await ctx.send(f"sell mod now set to {self.sell_mod}")
 
-    @commands.command(name='set_buy_mod')
-    @commands.is_owner()
-    async def set_buy_mod(self,mod:float):
+    #@commands.command(name='set_buy_mod')
+    #@commands.is_owner()
+    async def set_buy_mod(self, ctx, mod:float):
         """Sets the buy modifier, make sure it is higher than the sell mod and lower than 1 unless you want a wonkey game."""
         self.buy_mod=mod
         await ctx.send(f"buy mod now set to {self.buy_mod}")
@@ -568,7 +567,7 @@ class cardMini(commands.Cog):
             conn.close()
         return output
         
-    @commands.command(name='view_card',aliases=["card_view"])
+    #@commands.command(name='view_card',aliases=["card_view"])
     async def view_card(self,ctx,name,season):
         """View's a given card {name} can be an username or mention {season} should just be the name after Season_"""
         name = self.mentionToUser(ctx,name)
@@ -711,7 +710,7 @@ class cardMini(commands.Cog):
             # Close the connection
             conn.close()
 
-    @commands.command(name='sell_card')
+    #@commands.command(name='sell_card')
     async def sell_card(self, ctx, name, series):
         """Sell's a card to Gob, {name} can be a username or mention {series} should be the words/numbers after Season_"""
         server_id = str(ctx.guild.id)
@@ -787,7 +786,7 @@ class cardMini(commands.Cog):
 
 
 
-    @commands.command(name='buy_card')
+    #@commands.command(name='buy_card')
     async def buy_card(self, ctx, name, series):
         """Buy's a card to Gob, {name} can be a username or mention {series} should be the words/numbers after Season_"""
 
@@ -909,16 +908,16 @@ class cardMini(commands.Cog):
             conn.close()
             
 
-    @commands.command(name='chk_bank',aliases=["bank"])
+    #@commands.command(name='chk_bank',aliases=["bank"])
     async def chk_bank(self,ctx):
         """Checks your current bank total"""
         server_id = str(ctx.guild.id)
         await ctx.send(f"You have: {round(self.get_bank(server_id,ctx.author.id),2)} bank.")
 
         
-    @commands.command(name='set_bank')
-    @commands.is_owner()
-    async def set_bank(self,ctx,bank, acct: commands.MemberConverter):
+    #@commands.command(name='set_bank')
+    #@commands.is_owner()
+    async def set_bank(self,ctx,bank, acct: Member):
         """Sets a user's bank total"""
         server_id = str(ctx.guild.id)
         db_path = os.path.join(data_manager.cog_data_path(self), f'{server_id}.db')
@@ -938,8 +937,8 @@ class cardMini(commands.Cog):
         # Close the connection
             conn.close()
         
-    @commands.command(name='view_deck',aliases=["all_deck","deck"])
-    async def view_deck(self,ctx, name: commands.MemberConverter="",count=10):
+    #@commands.command(name='view_deck',aliases=["all_deck","deck"])
+    async def view_deck(self,ctx, name: Member="",count=10):
         """View your deck (or someone elses with {mention})"""
         if not name:
             #set the deck table 
@@ -1053,8 +1052,8 @@ class cardMini(commands.Cog):
             conn.close()    
 
 
-    @commands.command(name='set_steal_chance')
-    @commands.is_owner()
+    #@commands.command(name='set_steal_chance')
+    #@commands.is_owner()
     async def set_steal_chance(self,ctx,percent):
         """Sets the chance for Gob to steal a card when you try and open a pack starts at 1%"""
         if float(percent) > 50:
@@ -1062,8 +1061,8 @@ class cardMini(commands.Cog):
         self.steal_mod=percent
         await ctx.send(f"set_steal_chance set to {percent}")
     
-    @commands.command(name='open_pack',aliases=["open","random_user"])
-    @commands.cooldown(1, 5, commands.BucketType.user)
+    #@commands.command(name='open_pack',aliases=["open","random_user"])
+    #@commands.cooldown(1, 5, commands.BucketType.user)
     async def random_user(self, ctx):
         """Select a random user from the specified series and add their ID to the user's deck."""
 
@@ -1280,9 +1279,9 @@ class cardMini(commands.Cog):
             conn.close()        
 
     
-    @commands.command(name='delete_deck')
-    @commands.is_owner()
-    async def delete_deck(self, ctx, deck: commands.MemberConverter):
+    #@commands.command(name='delete_deck')
+    #@commands.is_owner()
+    async def delete_deck(self, ctx, deck: Member):
         """Deletes a {mention} deck"""
         server_id = str(ctx.guild.id)
 
@@ -1307,7 +1306,7 @@ class cardMini(commands.Cog):
         # Respond to the user
         await ctx.send(f"{deck.mention}'s deck deleted! {deck.id}")
 
-    @commands.command(name='list_season', aliases=["list_seasons"])
+    #@commands.command(name='list_season', aliases=["list_seasons"])
     async def list_series(self, ctx):
         """Lists all seasons"""
         server_id = str(ctx.guild.id)
@@ -1386,8 +1385,8 @@ class cardMini(commands.Cog):
             # Close the connection
             connection.close()
 
-    @commands.command(name='delete_card')
-    @commands.is_owner()
+    #@commands.command(name='delete_card')
+    #@commands.is_owner()
     async def delete_card(self, ctx, user_id: int, series: str):
         """Delete a card from everyones deck and the game"""
         # Get the server ID
@@ -1421,8 +1420,8 @@ class cardMini(commands.Cog):
         await ctx.send(f"Rows with userID {user_id} and season '{series}' deleted from 'deck_' tables!")
 
     
-    @commands.command(name='delete_series')
-    @commands.is_owner()
+    #@commands.command(name='delete_series')
+    #@commands.is_owner()
     async def delete_series(self, ctx, series: str):
         """Delete a season so it no longer is in the game"""
         # Get the server ID
@@ -1457,8 +1456,8 @@ class cardMini(commands.Cog):
 
 
     
-    @commands.command(name='new_season')
-    @commands.is_owner()
+    #@commands.command(name='new_season')
+    #@commands.is_owner()
     async def new_season(self, ctx, series: str,legendary_limit=None,epic_limit=None,ultra_rare_limit=None,rare_limit=None,uncommon_limit=None):
         """Creates a new season you can pass the limits for each rarity or it will take the default values"""
         file = os.path.join(data_manager.cog_data_path(self), f'on_season.txt')
@@ -1580,7 +1579,7 @@ class cardMini(commands.Cog):
             # Close the connection
             connection.close()
     
-    @commands.Cog.listener()
+    #@commands.Cog.listener()
     async def on_message(self, message):
         # Check if the message is from a bot or in a DM (optional)
         if message.author.bot or not message.guild:

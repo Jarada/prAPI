@@ -1,5 +1,5 @@
-from .cardMini import cardMini
+from .cardMini import CardMini
 
 
 async def setup(bot):
-    await bot.add_cog(cardMini(bot))
+    await bot.add_cog(CardMini(bot))
