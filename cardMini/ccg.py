@@ -91,7 +91,7 @@ async def ccgdvleaderboard(jenni, input):
         await card_mini.DV_leaderboard(Context(jenni, input), count)
     except:
         await card_mini.DV_leaderboard(Context(jenni, input))
-ccgdvleaderboard.commands = ['ccgdvl', 'DV_leaderboard', 'DVL', 'leaderboard_DV', 'dv_top', 'top_dv']
+ccgdvleaderboard.commands = ['ccgdvl', 'ccgdvleaderboard', 'ccgleaderboarddv', 'ccgdvtop', 'ccgtopdv']
 ccgdvleaderboard.priority = 'low'
 ccgdvleaderboard.thread = False
 ccgdvleaderboard.rate = 0
@@ -105,7 +105,7 @@ async def ccgbankleaderboard(jenni, input):
         await card_mini.bank_leaderboard(Context(jenni, input), count)
     except:
         await card_mini.bank_leaderboard(Context(jenni, input))
-ccgbankleaderboard.commands = ['ccgbal', 'bank_leaderboard', 'leaderboard_bank', 'bank_top', 'top_bank']
+ccgbankleaderboard.commands = ['ccgbal', 'ccgbankleaderboard', 'ccgleaderboardbank', 'ccgbanktop', 'ccgtopbank']
 ccgbankleaderboard.priority = 'low'
 ccgbankleaderboard.thread = False
 ccgbankleaderboard.rate = 0

@@ -14,7 +14,7 @@ from discord import Member
 class DataManager:
     @staticmethod
     def cog_data_path(card_mini):
-        return ""
+        return "ccg"
 data_manager = DataManager()
 
 class CardMini:
